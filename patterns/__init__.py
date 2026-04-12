@@ -1,0 +1,1 @@
+"""Godot Python gamedev patterns."""
