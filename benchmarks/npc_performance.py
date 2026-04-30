@@ -11,12 +11,12 @@ Prints a table showing FPS impact for 1, 10, 50, and 100 NPCs.
 
 from __future__ import annotations
 
-import sys
 import os
 import random
+import sys
 import time
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Callable
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -30,13 +30,12 @@ from patterns.entities import (
     Vector2,
 )
 
-
 # ---------------------------------------------------------------------------
 # Minimal FSM
 # ---------------------------------------------------------------------------
 
 
-def fsm_decide(entity: Entity, context: dict) -> str:  # noqa: ANN001
+def fsm_decide(entity: Entity, context: dict) -> str:
     """Ultra-fast FSM: O(1) table lookup, no heap allocation."""
     hp: HealthComponent | None = entity.get_component(ComponentType.HEALTH)
     if hp is None:
@@ -54,7 +53,7 @@ def fsm_decide(entity: Entity, context: dict) -> str:  # noqa: ANN001
 # ---------------------------------------------------------------------------
 
 
-def bt_decide(entity: Entity, context: dict) -> str:  # noqa: ANN001
+def bt_decide(entity: Entity, context: dict) -> str:
     """Lightweight inline BT: selector over three conditions."""
     hp: HealthComponent | None = entity.get_component(ComponentType.HEALTH)
     mv: MovementComponent | None = entity.get_component(ComponentType.MOVEMENT)
@@ -82,7 +81,7 @@ _LLM_LATENCY_S = 0.50  # 500 ms realistic Ollama latency on CPU
 _LLM_RESPONSES = ["patrol", "attack", "flee", "idle", "talk"]
 
 
-def llm_decide(entity: Entity, context: dict, cache: dict | None = None) -> str:  # noqa: ANN001
+def llm_decide(entity: Entity, context: dict, cache: dict | None = None) -> str:
     """Simulate blocking Ollama call; uses cache dict when provided."""
     cache_key = entity.entity_id + ":" + str(context.get("player_near"))
     if cache is not None and cache_key in cache:
@@ -206,7 +205,7 @@ def run_benchmarks() -> list[BenchResult]:
             0.005 * count  # 5 ms per NPC instead of 500 ms
             original = _LLM_LATENCY_S
 
-            import benchmarks.npc_performance as _self  # noqa: PLC0415
+            import benchmarks.npc_performance as _self
 
             _self._LLM_LATENCY_S = 0.005
 

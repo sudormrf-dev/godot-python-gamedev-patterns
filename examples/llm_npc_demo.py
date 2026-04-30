@@ -6,14 +6,13 @@ and dialogue generation without touching GDScript at runtime.
 
 from __future__ import annotations
 
+import os
 import random
+import sys
 import time
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any
-
-import sys
-import os
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -29,7 +28,6 @@ from patterns.entities import (
 )
 from patterns.scene import NodeType, Scene, SceneManager, SceneNode, SceneState
 from patterns.signals import SignalBus, SignalDefinition
-
 
 # ---------------------------------------------------------------------------
 # NPC FSM states

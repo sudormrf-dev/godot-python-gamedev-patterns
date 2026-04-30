@@ -6,12 +6,12 @@ Simulates 10 gameplay turns and prints the BT tick result each frame.
 
 from __future__ import annotations
 
+import os
 import random
 import sys
-import os
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Callable
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -25,7 +25,6 @@ from patterns.entities import (
     Vector2,
 )
 from patterns.signals import SignalBus, SignalDefinition
-
 
 # ---------------------------------------------------------------------------
 # Behavior tree primitives
@@ -43,7 +42,7 @@ class BTStatus(str, Enum):
 class BTNode:
     """Abstract base for all behavior tree nodes."""
 
-    def tick(self, ctx: "BTContext") -> BTStatus:
+    def tick(self, ctx: BTContext) -> BTStatus:
         """Execute one tick; return SUCCESS, FAILURE, or RUNNING."""
         raise NotImplementedError
 
@@ -51,11 +50,11 @@ class BTNode:
 class BTLeaf(BTNode):
     """Leaf node backed by a plain Python callable."""
 
-    def __init__(self, name: str, fn: Callable[["BTContext"], BTStatus]) -> None:
+    def __init__(self, name: str, fn: Callable[[BTContext], BTStatus]) -> None:
         self.name = name
         self._fn = fn
 
-    def tick(self, ctx: "BTContext") -> BTStatus:
+    def tick(self, ctx: BTContext) -> BTStatus:
         status = self._fn(ctx)
         return status
 
@@ -66,7 +65,7 @@ class BTSequence(BTNode):
     def __init__(self, children: list[BTNode]) -> None:
         self.children = children
 
-    def tick(self, ctx: "BTContext") -> BTStatus:
+    def tick(self, ctx: BTContext) -> BTStatus:
         for child in self.children:
             status = child.tick(ctx)
             if status != BTStatus.SUCCESS:
@@ -80,7 +79,7 @@ class BTSelector(BTNode):
     def __init__(self, children: list[BTNode]) -> None:
         self.children = children
 
-    def tick(self, ctx: "BTContext") -> BTStatus:
+    def tick(self, ctx: BTContext) -> BTStatus:
         for child in self.children:
             status = child.tick(ctx)
             if status != BTStatus.FAILURE:
