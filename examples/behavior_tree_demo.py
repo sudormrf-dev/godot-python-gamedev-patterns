@@ -24,7 +24,7 @@ from patterns.entities import (
     TransformComponent,
     Vector2,
 )
-from patterns.signals import Signal, SignalBus, SignalDefinition
+from patterns.signals import SignalBus, SignalDefinition
 
 
 # ---------------------------------------------------------------------------
@@ -106,7 +106,9 @@ class BTContext:
     log: list[str] = field(default_factory=list)
 
     def guardian_position(self) -> Vector2:
-        tf: TransformComponent | None = self.guardian.get_component(ComponentType.TRANSFORM)
+        tf: TransformComponent | None = self.guardian.get_component(
+            ComponentType.TRANSFORM
+        )
         return tf.position if tf else Vector2()
 
     def distance_to_player(self) -> float:
@@ -161,7 +163,9 @@ def perform_attack(ctx: BTContext) -> BTStatus:
 
     hp: HealthComponent | None = ctx.guardian.get_component(ComponentType.HEALTH)
     dmg = 10.0
-    ctx.record(f"  Attack: STRIKE for {dmg} dmg! Guardian HP={hp.current_hp if hp else '?'}")
+    ctx.record(
+        f"  Attack: STRIKE for {dmg} dmg! Guardian HP={hp.current_hp if hp else '?'}"
+    )
     return BTStatus.SUCCESS
 
 
@@ -177,7 +181,9 @@ def patrol(ctx: BTContext) -> BTStatus:
         tf.position = wp
 
     ctx.patrol_index += 1
-    ctx.record(f"  Patrol: moved to waypoint {ctx.patrol_index} ({wp.x:.0f},{wp.y:.0f})")
+    ctx.record(
+        f"  Patrol: moved to waypoint {ctx.patrol_index} ({wp.x:.0f},{wp.y:.0f})"
+    )
     return BTStatus.SUCCESS
 
 
@@ -239,9 +245,15 @@ def build_guardian() -> Entity:
     """Construct the guardian Entity with all required components."""
     guardian = Entity(entity_id="guardian_01", name="Guardian")
     guardian.add_tag(EntityTag.ENEMY)
-    guardian.add_component(ComponentType.TRANSFORM, TransformComponent(position=Vector2(300.0, 300.0)))
-    guardian.add_component(ComponentType.HEALTH, HealthComponent(max_hp=200.0, armor=5.0))
-    guardian.add_component(ComponentType.MOVEMENT, MovementComponent(speed=80.0, max_speed=160.0))
+    guardian.add_component(
+        ComponentType.TRANSFORM, TransformComponent(position=Vector2(300.0, 300.0))
+    )
+    guardian.add_component(
+        ComponentType.HEALTH, HealthComponent(max_hp=200.0, armor=5.0)
+    )
+    guardian.add_component(
+        ComponentType.MOVEMENT, MovementComponent(speed=80.0, max_speed=160.0)
+    )
     guardian.activate()
     return guardian
 
@@ -291,14 +303,18 @@ def run_demo() -> None:
         status = bt.tick(ctx)
         bus.emit("bt_tick", turn, status.value)
 
-        print(f"\n[TURN {turn:02d}] player@({ctx.player_position.x:.0f},{ctx.player_position.y:.0f})"
-              f"  ->  BT result: {status.value}")
+        print(
+            f"\n[TURN {turn:02d}] player@({ctx.player_position.x:.0f},{ctx.player_position.y:.0f})"
+            f"  ->  BT result: {status.value}"
+        )
         for line in ctx.log:
             print(line)
 
     hp: HealthComponent = guardian.get_component(ComponentType.HEALTH)
     print(f"\n[END] Guardian HP: {hp.current_hp:.1f}/{hp.max_hp:.1f}")
-    print(f"[END] Guardian position: ({ctx.guardian_position().x:.1f}, {ctx.guardian_position().y:.1f})")
+    print(
+        f"[END] Guardian position: ({ctx.guardian_position().x:.1f}, {ctx.guardian_position().y:.1f})"
+    )
     print("=" * 60)
 
 

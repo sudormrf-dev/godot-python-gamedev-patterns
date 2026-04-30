@@ -15,7 +15,7 @@ import sys
 import os
 import random
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Callable
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
@@ -131,7 +131,10 @@ def make_entities(count: int) -> list[Entity]:
     for i in range(count):
         e = Entity(entity_id=f"npc_{i}", name=f"NPC_{i}")
         e.add_tag(EntityTag.ENEMY)
-        e.add_component(ComponentType.TRANSFORM, TransformComponent(position=Vector2(float(i * 10), 0.0)))
+        e.add_component(
+            ComponentType.TRANSFORM,
+            TransformComponent(position=Vector2(float(i * 10), 0.0)),
+        )
         e.add_component(ComponentType.HEALTH, HealthComponent(max_hp=100.0))
         e.add_component(ComponentType.MOVEMENT, MovementComponent())
         e.activate()
@@ -162,7 +165,12 @@ def benchmark(
     timings.sort()
     total_ms = timings[len(timings) // 2]  # median
     per_npc_ms = total_ms / max(len(entities), 1)
-    return BenchResult(approach=label, npc_count=len(entities), total_ms=total_ms, per_npc_ms=per_npc_ms)
+    return BenchResult(
+        approach=label,
+        npc_count=len(entities),
+        total_ms=total_ms,
+        per_npc_ms=per_npc_ms,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -195,10 +203,11 @@ def run_benchmarks() -> list[BenchResult]:
         # 3. LLM no-cache (skip slow path for large counts in fast-mock mode)
         if _FAST_MOCK or count <= 1:
             llm_cache_none: dict | None = None
-            mock_latency = 0.005 * count  # 5 ms per NPC instead of 500 ms
+            0.005 * count  # 5 ms per NPC instead of 500 ms
             original = _LLM_LATENCY_S
 
             import benchmarks.npc_performance as _self  # noqa: PLC0415
+
             _self._LLM_LATENCY_S = 0.005
 
             def llm_no_cache(e: Entity, c: dict, _cache=llm_cache_none) -> str:
@@ -207,7 +216,7 @@ def run_benchmarks() -> list[BenchResult]:
             r_llm = BenchResult(
                 approach="LLM_NoCache",
                 npc_count=count,
-                total_ms=500.0 * count,   # realistic projection
+                total_ms=500.0 * count,  # realistic projection
                 per_npc_ms=500.0,
             )
             results.append(r_llm)
@@ -239,7 +248,9 @@ def print_table(results: list[BenchResult]) -> None:
     print("=" * 80)
     print("  NPC AI PERFORMANCE BENCHMARK")
     print("=" * 80)
-    print(f"  {'Approach':<18} {'NPCs':>5} {'Total ms':>10} {'Per NPC ms':>11} {'FPS budget':>11} {'Max FPS':>8}")
+    print(
+        f"  {'Approach':<18} {'NPCs':>5} {'Total ms':>10} {'Per NPC ms':>11} {'FPS budget':>11} {'Max FPS':>8}"
+    )
     print("-" * 80)
 
     for r in results:
